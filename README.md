@@ -15,3 +15,15 @@ SLinkedIn
   * OAuth2 API key and secret for LinkedIn
  
  
+Examples
+=========
+Examples can be found in the repository, examples include:
+
+* Get simple info (name, last name)
+* Share a post
+
+
+Reusing user tokens
+=========
+Store tokens from getTokenData().
+Use SimpleLinkedIn::setTokenData('USER_TOKEN') to reuse a stored token BEFORE calling authorize()!
