@@ -35,7 +35,7 @@ I recommend using json / standard behavior of this class. You can make request a
 behavior is auto-encoding to and from json and php objects. What that means is that you should just use arrays or objects for supplying data to a request.
 but if you json_encode it, or generate XML, it will still work:
 
-$ln->fetch('POST','/v1/foo',array( /*... data ...*/));
-$ln->fetch('POST','/v1/foo',json_encode(array( /*... data ...*/));
-$ln->fetch('POST','/v1/foo',$xmldom->saveXML(),'XML');
+* $ln->fetch('POST','/v1/foo',array( /*... data ...*/));
+* $ln->fetch('POST','/v1/foo',json_encode(array( /*... data ...*/));
+* $ln->fetch('POST','/v1/foo',$xmldom->saveXML(),'XML');
 
