@@ -72,7 +72,10 @@ class SimpleLinkedIn {
      * @param string $scope eg. 'rw_nus'
      */
     public function addScope($scope){
-        if(!in_array($scope,$this->TOKEN_STORAGE['current_scope'])){
+        /*
+         * If we know that scope needs to be extended, we do so by re-aquiring a token.
+        */
+        if(isset($this->TOKEN_STORAGE['current_scope']) && !in_array($scope,$this->TOKEN_STORAGE['current_scope'])){
             //Reset if we need to re aquire scope.
             $this->TOKEN_STORAGE['access_token'] = null;
         }
@@ -245,14 +248,17 @@ class SimpleLinkedIn {
         $url = 'https://api.linkedin.com' . $urlInfo['path'] . '?' . http_build_query($params);
         
         if(!is_string($body)){
-            if($format=='json')
+            if($format=='json'){
                 $body = json_encode($body);
-            
+            }
             if($format=='xml')
                 throw new SimpleLinkedInException('Please use a String in XML calls to SimpleLinkedin->fetch()');
         }
+        $response = $this->requestCURL($method,$url,$body,$format);
         
-        $response = json_decode($this->requestCURL($method,$url,$body,$format));
+        if($format=='json'){
+            $response = json_decode($response);
+        }
 
         if(isset($response->errorCode)){
             throw new Exception($response->message, $response->errorCode);
@@ -278,13 +284,13 @@ class SimpleLinkedIn {
      * @param type $accessToken Token string or assoc array with token info (see getTokenData)
      * @param type $expiresAt 
      */
-    public function setTokenData($accessToken, $expiresAt=null){
+    public function setTokenData($accessToken, $expiresAt=null,$scope=null){
         $this->TOKEN_STORAGE['access_token'] = $accessToken; // guard this!
         
         if(!$expiresAt){
             $expiresAt = time() + 120; //If we dont know the expire time we just guess
         }
-        
+        $this->TOKEN_STORAGE['current_scope'] = $scope;
         $this->TOKEN_STORAGE['expires_in']   = $expiresAt - time(); // relative time (in seconds)
         $this->TOKEN_STORAGE['expires_at']   = $expiresAt; // absolute time
     }
