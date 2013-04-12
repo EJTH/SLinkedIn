@@ -24,7 +24,7 @@ class SimpleLinkedIn {
     
     private $TOKEN_STORAGE;
     
-    private $DEBUG = false;
+    private $DISABLE_SSL_CHECK = true;
     
     /**
      * Create a new SimpleLinkedin intance. Specify the required apikey.
@@ -44,7 +44,8 @@ class SimpleLinkedIn {
         if($redirectUrl){
             $this->REDIRECT_URI = $redirectUrl;
         } else {
-            $this->REDIRECT_URI = $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+            $this->REDIRECT_URI = (isset($_SERVER['HTTPS']) ? 'https://':'http://') . $_SERVER['SERVER_NAME']
+                    . preg_replace('#\?.*#', '', $_SERVER['REQUEST_URI']);
         }
         
         //set scope.
@@ -145,29 +146,43 @@ class SimpleLinkedIn {
         $ch = curl_init($url);
         
         if( in_array($method, array('POST','PUT','DELETE')) ){
-            curl_setopt($ch, CURLOPT_POST, 1);
+            switch($method){
+                case 'POST': curl_setopt($ch, CURLOPT_POST, 1);
+                break;
+                case 'PUT' : curl_setopt($ch, CURLOPT_PUT, 1);
+                break;
+                case 'DELETE' : curl_setopt($ch, CURLOPT_POST, 1); /* Unsupported? */
+            }
             
-            $contentTypes = array(
-                'json' => array('application/json','json'),
-                'xml' => array('application/xml','xml'),
-            );
             
-            $type = $contentTypes[$type];
-            
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                "Content-type: application/$type[0]",
-                "x-li-format: $type[1]",
-                'Connection: close')
-            );
+            if($method=='POST'){
+                $contentTypes = array(
+                    'json' => array('application/json','json'),
+                    'xml' => array('application/xml','xml'),
+                );
+
+                $type = $contentTypes[$type];
+
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    "Content-type: application/$type[0]",
+                    "x-li-format: $type[1]",
+                    'Connection: close')
+                );
+            }
             curl_setopt($ch, CURLOPT_POSTFIELDS, $postData );
         }
+        
+        if($this->DISABLE_SSL_CHECK){
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        }
+        
         
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION  ,1);
         curl_setopt($ch, CURLOPT_HEADER          ,0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER  ,1);
 
         $result = curl_exec($ch);
-        curl_close($ch);
         
         return $result;
     }
@@ -216,7 +231,7 @@ class SimpleLinkedIn {
 
         $urlInfo = parse_url('https://api.linkedin.com'.$resource);
         
-        if($urlInfo['query']){
+        if(isset($urlInfo['query'])){
             $query = parse_str($urlInfo['query']);
             $params = array_merge($params,$query);
         }
