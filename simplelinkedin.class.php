@@ -72,6 +72,10 @@ class SimpleLinkedIn {
      * @param string $scope eg. 'rw_nus'
      */
     public function addScope($scope){
+        if(!in_array($scope,$this->TOKEN_STORAGE['current_scope'])){
+            //Reset if we need to re aquire scope.
+            $this->TOKEN_STORAGE['access_token'] = null;
+        }
         $this->SCOPE[] = $scope;
     }
     
@@ -122,6 +126,8 @@ class SimpleLinkedIn {
                         'state' => uniqid('', true), // unique long string
                         'redirect_uri' => $this->REDIRECT_URI,
                   );
+        
+        $this->TOKEN_STORAGE['current_scope'] = $this->SCOPE;
 
         // Authentication request
         $url = 'https://www.linkedin.com/uas/oauth2/authorization?' . http_build_query($params);
@@ -239,10 +245,10 @@ class SimpleLinkedIn {
         $url = 'https://api.linkedin.com' . $urlInfo['path'] . '?' . http_build_query($params);
         
         if(!is_string($body)){
-            if($type='json')
+            if($format=='json')
                 $body = json_encode($body);
             
-            if($type='xml')
+            if($format=='xml')
                 throw new SimpleLinkedInException('Please use a String in XML calls to SimpleLinkedin->fetch()');
         }
         
