@@ -8,7 +8,7 @@ $ln->addScope('rw_nus');
 //Authorize.
 if($ln->authorize()){
     //Make an example post, and print the result with print_r
-    print_r ($this->ln->fetch('POST','/v1/people/~/shares',
+    print_r ($ln->fetch('POST','/v1/people/~/shares',
         array(
             'comment' => 'Hello Linkedin',
             'content' => array(
