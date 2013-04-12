@@ -1,4 +1,4 @@
-SLinkedIn for PHP 5+
+A simple linkedin class for PHP 5+
 =========
  2013   Elias Toft Hansen    @    HR-Skyen ApS
  
@@ -37,5 +37,5 @@ but if you json_encode it, or generate XML, it will still work:
 
 * $ln->fetch('POST','/v1/foo',array( /*... data ...*/));
 * $ln->fetch('POST','/v1/foo',json_encode(array( /*... data ...*/));
-* $ln->fetch('POST','/v1/foo',$xmldom->saveXML(),'XML');
+* $ln->fetch('POST','/v1/foo',$xmldom->saveXML(),'xml'); //Data returned will be XML String!
 
