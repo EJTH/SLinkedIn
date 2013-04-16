@@ -21,7 +21,7 @@ Examples can be found in the repository, examples include:
 
 * Get simple info (name, last name)
 * Share a post
-
+* Reusing a consumer token stored in a database
 
 Reusing user tokens
 =========
