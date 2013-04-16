@@ -26,7 +26,7 @@ class SimpleLinkedInException extends Exception {
     
     /**
      * Returns json decoded response object associated with this exception (Only applies to fetch calls)
-     * @return stdClass last HTTP response from linkedin or null if NA.
+     * @return type last HTTP response from linkedin or null if NA.
      */
     public function getLastResponse(){
         return $this->lastResponse;
@@ -105,7 +105,7 @@ class SimpleLinkedIn {
     
     /**
      * Starts the authorization process. Call after construct or after user token has been set.
-     * @return true if authorized, false if user declined. Throws Exception on error.
+     * @return bool true if authorized, false if user declined. Throws Exception on error.
      */
     public function authorize(){
         // OAuth 2 Control Flow
@@ -156,7 +156,7 @@ class SimpleLinkedIn {
                   );
         
         $this->TOKEN_STORAGE['current_scope'] = $this->SCOPE;
-
+        
         // Authentication request
         $url = 'https://www.linkedin.com/uas/oauth2/authorization?' . http_build_query($params);
 
@@ -228,7 +228,7 @@ class SimpleLinkedIn {
     
     /**
      * Gets OAuth2 accesstoken.
-     * @return true
+     * @return bool true
      */
     private function getAccessToken() {
         $params = array('grant_type' => 'authorization_code',
@@ -245,11 +245,12 @@ class SimpleLinkedIn {
         
         // Native PHP object, please
         $token = json_decode($response);
-
-        // Store access token and expiration time
-        $this->TOKEN_STORAGE['access_token'] = $token->access_token; // guard this!
-        $this->TOKEN_STORAGE['expires_in']   = $token->expires_in; // relative time (in seconds)
-        $this->TOKEN_STORAGE['expires_at']   = time() + $this->TOKEN_STORAGE['expires_in']; // absolute time
+        if(isset($token->access_token)){
+            // Store access token and expiration time
+            $this->TOKEN_STORAGE['access_token'] = $token->access_token; // guard this!
+            $this->TOKEN_STORAGE['expires_in']   = $token->expires_in; // relative time (in seconds)
+            $this->TOKEN_STORAGE['expires_at']   = time() + $this->TOKEN_STORAGE['expires_in']; // absolute time
+        }
         return true;
     }
     
@@ -259,7 +260,7 @@ class SimpleLinkedIn {
      * @param type $method POST|GET|PUT|DELETE
      * @param type $resource Resource to make a call to. (eg. v1/people/~/connections)
      * @param type $body POST body data (Will be send as is if string is supplied, json_encoded if object or assoc array.)
-     * @return stdClass response object. Throws Exception on error.
+     * @return type response object. Throws Exception on error.
      */
     public function fetch($method, $resource, $body = '',$format='json') {
         //Query parameters needed to make a basic OAuth transaction
@@ -291,15 +292,14 @@ class SimpleLinkedIn {
         $response = $this->requestCURL($method,$url,$body,$format);
         
         if($format=='json'){
+            
             // Native PHP object, please
             $response = json_decode($response);
             if(isset($response->errorCode)){
-                if($response->status == 401){
-                    //If token is expired we simply reauthorize a new token.
-                    //But in CLI or if disabled we will throw an exception
-                    $this->resetToken();
-                    $this->authorize();
-                }
+                
+                //Reset token if expired.
+                if($response->status == 401) $this->resetToken ();
+                
                 throw new SimpleLinkedInException(
                     $response->message .
                       ' (Request ID: # '.$response->requestId.')', 
