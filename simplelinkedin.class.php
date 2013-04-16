@@ -1,6 +1,6 @@
 <?php
 /*
- * (C) 2013   Elias Toft Hansen    @    HR-Skyen ApS
+ * 2013   Elias Toft Hansen    @    HR-Skyen ApS
  * 
  * Having problems with older 3rd party linkedin API's we decided
  * that it was about time we migrated to OAuth2 and rewrote a proper sturdy 
