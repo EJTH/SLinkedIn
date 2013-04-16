@@ -32,7 +32,7 @@ if($ln->authorize()){
         if($e->getLastResponse()->status == 401){
             //reset the stored token, so we can go through the authorization process 
             //again at page refresh
-            TokenDB::setToken('');
+            TokenDB::resetToken();
             
             //Reauthorize..
             $ln->authorize();
