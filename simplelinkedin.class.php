@@ -29,7 +29,7 @@ class SimpleLinkedInException extends Exception {
      * @return type last HTTP response from linkedin or null if NA.
      */
     public function getLastResponse(){
-        return $this->lastResponse;
+        return $this->lastResponse; 
     }
 }
 
