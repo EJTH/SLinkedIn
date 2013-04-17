@@ -24,15 +24,12 @@ $ln = new SimpleLinkedIn('YOUR_API_KEY', 'YOUR_API_SECRET');
 //Set the current consumer token as the one stored in our DB.
 $ln->setTokenData(TokenDB::getToken());
 
-
 if($ln->authorize()){    
     try {
-        //Fetch user info
+        //Do some OAuth requests...
         $user = $ln->fetch('GET', '/v1/people/~:(firstName,lastName)');
         
-        
         print "Hello $user->firstName $user->lastName.";
-    
     
         //Update stored token.
         $tokenData = $ln->getTokenData();

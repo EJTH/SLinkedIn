@@ -331,6 +331,16 @@ class SimpleLinkedIn {
      * @param type @reAuth If running as cron, or you dont want this class to redirect the user to linkedin login on token expiration. 
      */
     public function setTokenData($accessToken, $expiresAt=null,$scope=null,$reAuth=true){
+        if(is_array($accessToken)){
+            if(!$accessToken['expires_at']){
+                $accessToken['expires_at'] = time() + 240;
+            }
+            $accessToken['expires_in'] = $accessToken['expires_in'] - time();
+            
+            $this->TOKEN_STORAGE = $accessToken;
+            return;
+        }
+        
         $this->TOKEN_STORAGE['access_token'] = $accessToken; // guard this!
         
         if(!$expiresAt){
