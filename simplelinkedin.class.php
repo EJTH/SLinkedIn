@@ -277,8 +277,8 @@ class SimpleLinkedIn {
             $params = array_merge($params,$query);
         }
         
-        //Build resource URI
-        $url = 'https://api.linkedin.com' . $urlInfo['path'] . '?' . http_build_query($params);
+        //Build resource URI - enforce use of & as variable seperator, because it changes with PHP version.
+        $url = 'https://api.linkedin.com' . $urlInfo['path'] . '?' . http_build_query($params, '', '&');
         
         //Some basic encoding to json if an object or array type is send as body
         if(!is_string($body)){
