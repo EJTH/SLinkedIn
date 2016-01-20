@@ -273,7 +273,7 @@ class SimpleLinkedIn {
         $urlInfo = parse_url('https://api.linkedin.com'.$resource);
         
         if(isset($urlInfo['query'])){
-            $query = parse_str($urlInfo['query']);
+            parse_str($urlInfo['query'], $query);
             $params = array_merge($params,$query);
         }
         
